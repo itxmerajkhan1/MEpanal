@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isAdmin() {
+      return isAuthenticated() &&
+        ((exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
+          (request.auth.token.email == "merajkhan3109@gmail.com" && request.auth.token.email_verified == true));
+    }
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+    function uidUnchanged() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
+    }
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+    function isValidStatus(status) {
+      return status in ['pending', 'processing', 'completed'];
+    }
+
+    // ===============================================================
+    // User Profiles
+    // ===============================================================
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && 
+        request.resource.data.keys().hasAll(['uid', 'email', 'firstName', 'lastName']) &&
+        request.resource.data.uid == userId &&
+        isValidEmail(request.resource.data.email);
+      allow update: if (isOwner(userId) && 
+        request.resource.data.uid == resource.data.uid &&
+        request.resource.data.email == resource.data.email &&
+        request.resource.data.role == resource.data.role) || isAdmin();
+    }
+
+    // ===============================================================
+    // Orders
+    // ===============================================================
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (isAdmin() || (resource != null && resource.data.userId == request.auth.uid));
+      allow create: if isAuthenticated() && 
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['userId', 'firstName', 'lastName', 'serviceId', 'serviceName', 'platform', 'link', 'quantity', 'pricePer1000', 'totalPrice', 'status', 'createdAt']) &&
+        request.resource.data.quantity >= 100 &&
+        request.resource.data.platform in ['TikTok', 'Instagram', 'Facebook'] &&
+        request.resource.data.pricePer1000 > 0 &&
+        request.resource.data.totalPrice >= 0 &&
+        isValidStatus(request.resource.data.status);
+      allow update: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.serviceId == resource.data.serviceId);
+      allow delete: if isAdmin();
+    }
+  }
+}

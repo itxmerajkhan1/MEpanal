@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user-specific metadata and settings.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique identifier for the user." },
+        "email": { "type": "string", "format": "email", "description": "The user's email address." },
+        "firstName": { "type": "string", "description": "The user's first name." },
+        "lastName": { "type": "string", "description": "The user's last name." },
+        "displayName": { "type": "string", "description": "The user's display name." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the profile was created." },
+        "theme": { "type": "string", "enum": ["light", "dark"], "description": "User's preferred theme." },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User's role." }
+      },
+      "required": ["uid", "email", "firstName", "lastName"]
+    },
+    "Order": {
+      "title": "Service Order",
+      "description": "Stores an order for a social media service.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The user ID who placed the order." },
+        "firstName": { "type": "string", "description": "The first name of the user." },
+        "lastName": { "type": "string", "description": "The last name of the user." },
+        "serviceId": { "type": "string", "description": "ID of the service (e.g., tiktok-followers)." },
+        "serviceName": { "type": "string", "description": "Name of the service." },
+        "platform": { "type": "string", "description": "Social media platform (TikTok, Instagram, Facebook)." },
+        "link": { "type": "string", "description": "The social media link or username." },
+        "quantity": { "type": "integer", "description": "The amount ordered." },
+        "pricePer1000": { "type": "number", "description": "Price per 1000 units in PKR." },
+        "totalPrice": { "type": "number", "description": "Total price of the order in PKR." },
+        "status": { "type": "string", "enum": ["pending", "processing", "completed"], "description": "Current status of the order." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the order was placed." }
+      },
+      "required": ["userId", "firstName", "lastName", "serviceId", "serviceName", "platform", "link", "quantity", "pricePer1000", "totalPrice", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents."
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Service order documents."
+    }
+  }
+}

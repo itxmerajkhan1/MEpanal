@@ -1,0 +1,20 @@
+{
+  "short_name": "ME Panel",
+  "name": "ME Panel SaaS Dashboard",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/socialboost/192/192",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://picsum.photos/seed/socialboost/512/512",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
