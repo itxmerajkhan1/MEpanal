@@ -23,8 +23,13 @@ export default function OrderModal({ service, onClose }: OrderModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !userData) {
-      toast.error('Please login to place an order');
+      toast.error('ACCESS DENIED: Please initialize session first.');
       return;
+    }
+
+    if (quantity < 100) {
+       toast.error('VALIDATION ERROR: Minimum quantitiy is 100 units.');
+       return;
     }
 
     setLoading(true);
@@ -43,10 +48,10 @@ export default function OrderModal({ service, onClose }: OrderModalProps) {
         status: 'pending',
         createdAt: new Date().toISOString(),
       });
-      toast.success('Order placed successfully!');
+      toast.success('MISSION DEPLOYED: Order logs successfully initialized.');
       onClose();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to place order');
+      toast.error(error.message || 'MISSION FAILED: Command execution error.');
     } finally {
       setLoading(false);
     }
@@ -60,54 +65,58 @@ export default function OrderModal({ service, onClose }: OrderModalProps) {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/80 backdrop-blur-md"
         />
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          initial={{ opacity: 0, scale: 0.9, y: 30 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-2xl overflow-hidden"
+          exit={{ opacity: 0, scale: 0.9, y: 30 }}
+          className="relative w-full max-w-lg bg-[#0f0f12] rounded-[2.5rem] border border-white/10 p-10 shadow-[0_0_50px_rgba(37,99,235,0.2)] overflow-hidden"
         >
-          <div className={`absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${service.color}`} />
+          <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${service.color} shadow-[0_0_15px_rgba(255,255,255,0.2)]`} />
           
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <div className={`p-3 rounded-2xl bg-gradient-to-br ${service.color} text-white shadow-lg`}>
-                <ShoppingCart className="w-6 h-6" />
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-5">
+              <div className={`p-4 rounded-3xl bg-gradient-to-br ${service.color} text-white shadow-2xl relative`}>
+                <ShoppingCart className="w-7 h-7" />
+                <div className="absolute inset-0 bg-white/20 rounded-3xl animate-pulse" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{service.name}</h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">Place your order below</p>
+                <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter">{service.name}</h2>
+                <p className="text-gray-500 font-bold uppercase tracking-widest text-[10px]">MISSION PROTOCOL: INITIALIZE</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5"
             >
-              <X className="w-6 h-6 text-gray-400" />
+              <X className="w-6 h-6 text-gray-500" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <LinkIcon className="w-4 h-4" />
-                Profile Link / Username
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                <LinkIcon className="w-3 h-3 text-blue-400" />
+                Target Link / Terminal ID
               </label>
-              <input
-                type="text"
-                placeholder="https://tiktok.com/@username"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
-                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-                required
-              />
+              <div className="relative group">
+                <input
+                  type="text"
+                  placeholder="DEPLOYMENT TARGET (e.g. Profile URL)"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-white placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all font-black italic tracking-wider group-hover:border-white/10"
+                  required
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-500 border border-blue-400/50 rounded-full animate-ping pointer-events-none" />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                <Hash className="w-4 h-4" />
-                Quantity
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                <Hash className="w-3 h-3 text-emerald-400" />
+                Unit Payload (Quantity)
               </label>
               <input
                 type="number"
@@ -115,42 +124,43 @@ export default function OrderModal({ service, onClose }: OrderModalProps) {
                 step="100"
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
-                className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-6 text-white placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all font-black italic tracking-wider"
                 required
               />
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                <span>Minimum order: 100 units</span>
-                <span className="font-bold text-indigo-600 dark:text-indigo-400">1000 = Rs {service.pricePer1000}</span>
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                <span className="text-gray-600">Min Deployment: 100 Units</span>
+                <span className="text-emerald-500 italic">Rate: Rs {service.pricePer1000}/1k</span>
               </div>
             </div>
 
-            <div className="bg-gray-50 dark:bg-white/5 rounded-2xl p-6 border border-gray-100 dark:border-white/5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-500 dark:text-gray-400">Price per 1000</span>
-                <span className="font-semibold text-gray-900 dark:text-white">Rs {service.pricePer1000}</span>
+            <div className="bg-white/5 rounded-3xl p-8 border border-white/5 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Unit Price Protocol</span>
+                <span className="font-black text-white italic">Rs {service.pricePer1000}</span>
               </div>
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-white/10">
-                <span className="text-lg font-bold text-gray-900 dark:text-white">Total Price</span>
-                <div className="flex items-center gap-1 text-2xl font-black text-indigo-600 dark:text-indigo-400">
-                  <span className="text-sm font-bold mr-1">Rs</span>
-                  <span>{totalPrice}</span>
+              <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                <span className="text-lg font-black text-white uppercase italic tracking-tighter">Total Credits</span>
+                <div className="flex items-baseline gap-1 animate-pulse">
+                  <span className="text-sm font-black text-blue-400 uppercase italic mr-1">Rs</span>
+                  <span className="text-4xl font-black text-blue-400 italic tracking-tighter">{totalPrice}</span>
                 </div>
               </div>
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className={`w-full bg-gradient-to-r ${service.color} text-white font-bold py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50`}
+              className={`w-full bg-white text-black font-black py-5 rounded-2xl shadow-[0_15px_30px_rgba(255,255,255,0.1)] flex items-center justify-center gap-3 transition-all disabled:opacity-50 uppercase tracking-[0.2em] text-sm group`}
             >
               {loading ? (
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-6 h-6 border-4 border-black/30 border-t-black rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Confirm Order</span>
-                  <ShoppingCart className="w-5 h-5" />
+                  <span>Execute Deployment</span>
+                  <ShoppingCart className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </motion.button>
